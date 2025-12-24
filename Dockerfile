@@ -1,7 +1,6 @@
-# Étape 1 : Builder PHP + Composer + extensions
-FROM php:8.4-fpm AS builder
+FROM php:8.4-fpm
 
-# Installer dépendances système et extensions PHP
+# Install system dependencies + PHP extensions
 RUN apt-get update && apt-get install -y \
     git \
     unzip \
@@ -10,31 +9,28 @@ RUN apt-get update && apt-get install -y \
     libpng-dev \
     libjpeg-dev \
     libfreetype6-dev \
+    zip \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql zip gd
+    && docker-php-ext-install \
+        pdo \
+        pdo_pgsql \
+        zip \
+        gd \
+    && rm -rf /var/lib/apt/lists/*
 
-# Installer Composer
+# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
 
-# Copier le projet
+# Copy application
 COPY . .
 
-# Installer les dépendances PHP optimisées pour la production
+# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Étape 2 : Image finale légère
-FROM php:8.4-fpm
-
-WORKDIR /var/www
-
-# Copier le code et les dépendances depuis le builder
-COPY --from=builder /var/www /var/www
-COPY --from=builder /usr/local/etc/php /usr/local/etc/php
-
-# Exposer le port standard HTTP
+# Render listens on 8080
 EXPOSE 8080
 
-# Commande de démarrage : migrations + PHP-FPM
+# Run migrations then start PHP-FPM
 CMD ["sh", "-c", "php artisan migrate --force && php-fpm"]
