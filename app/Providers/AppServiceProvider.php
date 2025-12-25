@@ -3,10 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Schema;
 
-
-// app/Providers/AppServiceProvider.php
-use Database\Seeders\InitialDataSeeder;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,13 +16,24 @@ class AppServiceProvider extends ServiceProvider
         //
     }
 
-    public function boot()
+
+    public function boot(): void
     {
-        if (\App::environment('production')) {
-            $seeder = new InitialDataSeeder();
-            $seeder->run();
+        // 🛑 Stop si on est en CLI (composer, artisan, docker build)
+        if (app()->runningInConsole()) {
+            return;
         }
+    
+        // 🛑 Stop si la table n'existe pas encore
+        if (!Schema::hasTable('users')) {
+            return;
+        }
+    
+        // ✅ Là seulement tu peux interroger la DB
+        // Exemple :
+        // $gerant = User::where('username', 'gerant')->first();
     }
+
 
     /**
      * Bootstrap any application services.
