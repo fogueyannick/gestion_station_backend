@@ -46,6 +46,6 @@ COPY docker/nginx.conf /etc/nginx/nginx.conf
 # Permissions Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-EXPOSE 8080
+EXPOSE 9000
 
 CMD sh -c "php artisan migrate --force && php-fpm -D && nginx -g 'daemon off;'"
