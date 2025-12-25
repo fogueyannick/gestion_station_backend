@@ -1,36 +1,42 @@
-FROM php:8.4-fpm
+# ---------- Builder ----------
+FROM php:8.4-fpm AS builder
 
-# Install system dependencies + PHP extensions
 RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    libpq-dev \
-    libzip-dev \
-    libpng-dev \
-    libjpeg-dev \
-    libfreetype6-dev \
-    zip \
+    git unzip libpq-dev libzip-dev \
+    libpng-dev libjpeg-dev libfreetype6-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install \
-        pdo \
-        pdo_pgsql \
-        zip \
-        gd \
-    && rm -rf /var/lib/apt/lists/*
+    && docker-php-ext-install pdo pdo_pgsql zip gd opcache
 
-# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www
-
-# Copy application
 COPY . .
-
-# Install PHP dependencies
 RUN composer install --no-dev --optimize-autoloader
 
-# Render listens on 8080
+
+# ---------- Runtime ----------
+FROM php:8.4-fpm
+
+# Installer Nginx
+RUN apt-get update && apt-get install -y nginx \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /var/www
+
+# Copier l'application
+COPY --from=builder /var/www /var/www
+
+# Config PHP + OPcache
+COPY docker/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+
+# Config Nginx
+COPY docker/nginx.conf /etc/nginx/nginx.conf
+
+# Permissions Laravel
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
+# Render écoute 8080
 EXPOSE 8080
 
-# Run migrations then start PHP-FPM
-CMD ["sh", "-c", "php artisan migrate --force && php-fpm"]
+# Démarrage
+CMD sh -c "php artisan migrate --force && php-fpm -D && nginx -g 'daemon off;'"
