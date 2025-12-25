@@ -4,9 +4,9 @@ FROM php:8.4-fpm AS builder
 # Installer les dépendances système nécessaires
 RUN apt-get update && apt-get install -y \
     git unzip libzip-dev libpng-dev libjpeg-dev libfreetype6-dev \
-    libpq-dev \
+    libpq-dev libxml2-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql zip gd opcache
+    && docker-php-ext-install pdo pdo_pgsql zip gd opcache xml mbstring
 
 # Installer composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
@@ -27,9 +27,9 @@ FROM php:8.4-fpm
 # Installer Nginx et les extensions PHP nécessaires
 RUN apt-get update && apt-get install -y \
     nginx \
-    libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libpq-dev \
+    libzip-dev libpng-dev libjpeg-dev libfreetype6-dev libpq-dev libxml2-dev \
     && docker-php-ext-configure gd --with-freetype --with-jpeg \
-    && docker-php-ext-install pdo pdo_pgsql zip gd opcache \
+    && docker-php-ext-install pdo pdo_pgsql zip gd opcache xml mbstring \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www
@@ -37,16 +37,17 @@ WORKDIR /var/www
 # Copier l'application depuis le builder
 COPY --from=builder /var/www /var/www
 
-# Config PHP + OPcache
+# Copier les fichiers de config PHP et OPcache
 COPY docker/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
+COPY docker/php.ini /usr/local/etc/php/conf.d/custom.ini
 
-# Config Nginx
+# Copier la config Nginx
 COPY docker/nginx.conf /etc/nginx/nginx.conf
 
 # Permissions Laravel
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
 
-# Expose le port FPM (9000) et Nginx (optionnel si reverse proxy)
+# Expose le port FPM (9000) et Nginx
 EXPOSE 9000
 
 # Commande de démarrage
