@@ -7,6 +7,8 @@ use App\Http\Controllers\ReportController;
 // Routes publiques
 Route::post('auth/login', [AuthController::class, 'login'])->name('login');
 Route::post('auth/refresh', [AuthController::class, 'refresh']); // optionnel
+Route::get('/ping', fn() => response()->json(['status' => 'ok']));
+
 
 // Routes protégées SPA web (cookies)
 Route::middleware(['auth:sanctum'])->group(function () {

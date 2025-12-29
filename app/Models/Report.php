@@ -39,10 +39,10 @@ class Report extends Model
     protected $casts = [
         'date' => 'date',
         'versement' => 'float',
+        'photos' => 'array',
         'depenses' => 'array',
         'autres_ventes' => 'array',
         'commandes' => 'array',
-        'photos' => 'array',
     ];
 
     // Relation : chaque rapport appartient à un user

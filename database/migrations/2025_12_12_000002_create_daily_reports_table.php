@@ -37,12 +37,14 @@ return new class extends Migration
 
             // Versement et dépenses
             $table->decimal('versement', 12, 2)->default(0);
-            $table->json('depenses')->nullable()->default(json_encode([]));
-            $table->json('autres_ventes')->nullable()->default(json_encode([]));
-            $table->json('commandes')->nullable()->default(json_encode([]));
+
+            $table->json('depenses')->nullable();
+            $table->json('autres_ventes')->nullable();
+            $table->json('commandes')->nullable();
 
             // Photos
-            $table->json('photos')->nullable()->default(json_encode([]));
+            $table->json('photos')->nullable();
+
 
             $table->timestamps();
 
@@ -53,6 +55,6 @@ return new class extends Migration
 
     public function down(): void
     {
-        Schema::dropIfExists('daily_reports');
+        Schema::dropIfExists('reports');
     }
 };

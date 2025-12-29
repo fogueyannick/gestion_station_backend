@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Report;      // Use the correct Report model
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class ReportController extends Controller
 {
@@ -13,6 +14,9 @@ class ReportController extends Controller
      */
     public function store(Request $request)
     {
+        \Log::info('RAW SIZE', [
+            'content_length' => request()->server('CONTENT_LENGTH'),
+        ]);
         $validated = $request->validate([
             'station_id' => 'required|integer|exists:stations,id',
             'date' => 'required|date',
@@ -36,61 +40,101 @@ class ReportController extends Controller
             'autres_ventes'  => 'nullable|array',
             'commandes'      => 'nullable|array',
 
-            'photos.*' => 'nullable|image',
+            'photos'       => 'nullable',
+            'photos.*'     => 'file|image|max:5120', // 5 MB
+            'photos_keys'  => 'nullable|array',
+            'photos_keys.*'=> 'string',
+
+
         ]);
 
-        // ✅ DÉFINITION AVANT UTILISATION
+        // Préparer les tableaux JSON
         $depenses = array_values($request->input('depenses', []));
         $autresVentes = array_values($request->input('autres_ventes', []));
         $commandes = array_values($request->input('commandes', []));
+        
+        $rawDate = trim($validated['date']);
 
-        // 📸 Photos
-        $photos = [];
-        if ($request->hasFile('photos')) {
-            foreach ($request->file('photos') as $key => $file) {
-                $photos[$key] = $file->store('reports', 'public');
-            }
-        }
+        $date = str_contains($rawDate, '/')
+            ? Carbon::createFromFormat('d/m/Y', $rawDate)
+            : Carbon::parse($rawDate);
 
+        $date = $date->startOfDay();
+
+        // Créer ou mettre à jour le rapport
         $report = Report::updateOrCreate(
             [
                 'station_id' => $validated['station_id'],
-                'date'       => $validated['date'],
+                'user_id'    => Auth::id(),   // ✅ OBLIGATOIRE
+                'date'       => $date,
             ],
             [
-                'user_id' => Auth::id(),
-
                 'super1_index'  => $validated['super1_index'],
                 'super2_index'  => $validated['super2_index'],
                 'super3_index'  => $validated['super3_index'],
-
                 'gazoil1_index' => $validated['gazoil1_index'],
                 'gazoil2_index' => $validated['gazoil2_index'],
                 'gazoil3_index' => $validated['gazoil3_index'],
-
                 'stock_sup_9000'  => $validated['stock_sup_9000'],
                 'stock_sup_10000' => $validated['stock_sup_10000'],
                 'stock_sup_14000' => $validated['stock_sup_14000'],
                 'stock_gaz_10000' => $validated['stock_gaz_10000'],
                 'stock_gaz_6000'  => $validated['stock_gaz_6000'],
-
                 'versement' => $validated['versement'] ?? 0,
-
-                // ✅ TABLEAUX COMPLETS
-                'depenses'      => $depenses,
+                'depenses' => $depenses,
                 'autres_ventes' => $autresVentes,
-                'commandes'     => $commandes,
-
-                'photos' => $photos,
+                'commandes' => $commandes,
             ]
         );
 
+        //dd($request->file('photos'), $request->input('photos_keys'));
+
+        // Gérer les photos envoyées depuis Flutter
+        \Log::info('FILES TER', [
+            'hasPhotos' => $request->hasFile('photos'),
+            'files' => $request->file('photos'),
+            'keys' => $request->input('photos_keys'),
+        ]);
+
+        // Récupérer les photos et leurs clés envoyées par Flutter
+        $photos = $request->file('photos');       // tableau d'UploadedFile
+        $keys   = $request->input('photos_keys'); // tableau de clés ['super1', 'gaz2', ...]
+
+        // Tableau pour stocker le JSON final
+        $storedPhotos = [];
+
+        if ($photos && $keys) {
+            foreach ($photos as $index => $photo) {
+                $key = $keys[$index] ?? "photo_$index"; // fallback si clé manquante
+
+                // Stocker le fichier dans storage/app/public/reports/{report_id}
+                $path = $photo->store("reports/{$report->id}", 'public');
+
+                // Ajouter au tableau de photos à sauvegarder en DB
+                $storedPhotos[] = [
+                    'key'  => $key,
+                    'path' => $path,
+                ];
+            }
+        }
+
+        // Sauvegarder les chemins en JSON dans la colonne 'photos'
+        $report->photos = json_encode($storedPhotos);
+        $report->save();
+
+        // Log pour vérifier côté serveur
+        \Log::info('PHOTOS SAVED', [
+            'photos' => $storedPhotos,
+        ]);
+
+        //print($photos);
+
+
         return response()->json([
             'message' => 'Rapport enregistré',
-            'report' => $report->load('user','station'),
+            'report'  => $report->load('user','station'),
         ], 201);
     }
-
 
 
     /**
