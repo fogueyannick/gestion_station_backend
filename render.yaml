@@ -1,0 +1,55 @@
+# Déploiement complet Laravel + PostgreSQL sur Render
+services:
+  - type: web
+    name: laravel-app
+    env: docker
+    plan: starter
+    dockerfilePath: Dockerfile
+    branch: main
+    autoDeploy: true
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: Laravel
+      - key: APP_ENV
+        value: production
+      - key: APP_KEY
+        value: base64:eiwQfGJLFn5Dpn5mSiL7jlX7VsUv/zq0zmi+nBB1xkA=
+      - key: APP_DEBUG
+        value: "false"
+      - key: APP_URL
+        value: stationaubergebafoussam.com
+
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_LEVEL
+        value: debug
+
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        value: "{{services.database.host}}"
+      - key: DB_PORT
+        value: "{{services.database.port}}"
+      - key: DB_DATABASE
+        value: "{{services.database.database}}"
+      - key: DB_USERNAME
+        value: "{{services.database.user}}"
+      - key: DB_PASSWORD
+        value: "{{services.database.password}}"
+
+      - key: CACHE_DRIVER
+        value: file
+      - key: QUEUE_CONNECTION
+        value: sync
+      - key: SESSION_DRIVER
+        value: file
+      - key: SESSION_LIFETIME
+        value: "120"
+
+databases:
+  - name: database
+    engine: postgres
+    plan: starter
+    region: oregon
+    version: "15"
