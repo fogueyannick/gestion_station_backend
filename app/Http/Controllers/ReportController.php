@@ -7,6 +7,9 @@ use App\Models\Report;      // Use the correct Report model
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 
+use App\Services\GcsUploader;
+
+
 class ReportController extends Controller
 {
     /**
@@ -61,6 +64,7 @@ class ReportController extends Controller
 
         $date = $date->startOfDay();
 
+
         // Créer ou mettre à jour le rapport
         $report = Report::updateOrCreate(
             [
@@ -101,7 +105,7 @@ class ReportController extends Controller
         $keys   = $request->input('photos_keys'); // tableau de clés ['super1', 'gaz2', ...]
 
         // Tableau pour stocker le JSON final
-        $storedPhotos = [];
+/*         $storedPhotos = [];
 
         if ($photos && $keys) {
             foreach ($photos as $index => $photo) {
@@ -116,11 +120,52 @@ class ReportController extends Controller
                     'path' => $path,
                 ];
             }
+        } */
+
+/*         $storedPhotos = [];
+
+        foreach ($request->file('photos') as $index => $photo) {
+            $key = $request->photos_keys[$index];
+
+            $url = GcsUploader::upload(
+                $photo,
+                "reports/{$report->id}"
+            );
+
+            $storedPhotos[] = [
+                'key' => $key,
+                'url' => $url,
+            ];
         }
+
 
         // Sauvegarder les chemins en JSON dans la colonne 'photos'
         $report->photos = json_encode($storedPhotos);
         $report->save();
+
+ */
+
+        $storedPhotos = [];
+
+        if ($request->hasFile('photos')) {
+            foreach ($request->file('photos') as $index => $photo) {
+                $key = $request->photos_keys[$index] ?? null;
+
+                $url = GcsUploader::upload(
+                    $photo,
+                    "reports/{$report->id}"
+                );
+
+                $storedPhotos[] = [
+                    'key' => $key,
+                    'url' => $url,
+                ];
+            }
+        }
+
+        $report->photos = json_encode($storedPhotos);
+        $report->save();
+
 
         // Log pour vérifier côté serveur
         \Log::info('PHOTOS SAVED', [

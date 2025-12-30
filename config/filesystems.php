@@ -28,6 +28,7 @@ return [
     |
     */
 
+    /*
     'disks' => [
 
         'local' => [
@@ -37,6 +38,20 @@ return [
             'throw' => false,
             'report' => false,
         ],
+    */
+
+    'disks' => [
+
+        // disque par défaut
+        'gcs' => [
+            'driver' => 'gcs',
+            'project_id' => env('GCP_PROJECT_ID', 'ton-projet-id'),
+            'key_file' => env('GCP_KEY_FILE', null), // chemin vers ton fichier JSON
+            'bucket' => env('GCP_BUCKET', 'station-reports-images'),
+            'path_prefix' => null,
+            'storage_api_uri' => null,
+        ],
+
 
         'public' => [
             'driver' => 'local',

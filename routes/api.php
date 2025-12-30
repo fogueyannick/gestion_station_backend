@@ -4,6 +4,10 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ReportController;
 
+use App\Services\GcsUploader;
+use Illuminate\Http\Request;
+
+
 // Routes publiques
 Route::post('auth/login', [AuthController::class, 'login'])->name('login');
 Route::post('auth/refresh', [AuthController::class, 'refresh']); // optionnel
@@ -27,4 +31,11 @@ Route::middleware([
     Route::get('reports', [ReportController::class, 'index']);
     Route::get('dashboard/stats', [ReportController::class, 'stats']);
     Route::delete('reports/{id}', [ReportController::class, 'destroy']);
+});
+
+
+
+Route::post('/test-upload', function (Request $request) {
+    $url = GcsUploader::upload($request->file('photo'), 'tests');
+    return response()->json(['url' => $url]);
 });
