@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "charged-chess-482722-h2",
+  "private_key_id": "16339f0c79053c891f3c7610d28611cd259409a1",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQCpa4LmiGKFah6k\nGl5ycH3NbvBH5nxY088SH+ix+lTCtYfmEqBpBeKK2ZRurMzf99k6CS1Hi9epEztj\nfV5lildh0eQokF7RWAV3ddmELCsXPQraTGybwyvd8uUcBPWxo0GuqwAmcZcpSDMO\nZHekUkUEXQHDwYIj4gs78MIO2/UlQuK9BjO2Mvv1aspkdG4cLekCBnZvWqiz+p/D\ngeDQZj+ICzYIpKJT0Yxw7lkgcQCQQdxGx2FnOnzvG/5MKx7/bsjEHv1N/Ix8aOmF\nl9sJtE0sV2U3MRFF5xjcFVP8MP3qW/57tt8Xtm5b62e3ZaBMWFIpBDZEEEyobZZ+\n6pZeieYZAgMBAAECggEAAUKX6giiaUvgumIpqO1U2uFGp1WWapo5CxwCkPKpLKa+\nl1EKO/xpAupLTXdFUav6zoYo3dmooweDYfIZ0JnyxwWxbjWkW5IC02XvNjRBEKE5\nz7sbtTJiei+EnFIIn6I/Wodc1ExfaOq9BNAYPY2GRCSqyaa/2y4NnOvljkhSS9fv\nChL48lE+skbtHLjmOv7cZ6xs7oZTkNiFtL9+uJA57U79l0Qpb2b+oW7LUgmNBuTc\n2/2Q5ADLndAhLhOM6/PF7oD/787+T/mwEvehYhx2ZT6C5cdg5U2+zL5rQ04955zq\nz82oDRiaijHXEY3+SLLkvIuQdXkSNc6ruQgJLtlGoQKBgQDaTARfQIrhobkN61Hi\nuZY5hB2hVTBsnGHH8/gz68Z6w3JkBDXsy7yLYBezNY1njVXJszmNfHagOHBC9IaU\nbolWRMF7I+vm2kgithXOgbIDJ3w7OTX9qoA3nx9S4aafWJfwJlO4WSUAKoSj0tKH\njMRUvMuL2Kz9bNr7Zk1X92ZsYQKBgQDGrmcGOIE1/xO3n/hFX5y/sD12GAnB/IxS\nL+7Jl/+YjC8jamFXu4rHYOxPTwYjSswqoukpMxNc87lpcD+ktrzZ4HLrJXwMCV5C\n9FZ48K/a97XHyRmCt31+1usw4sg6tw8hMIhRb20k3Lb04HM7vxzlq0JbfiAOjA1k\nnNgJv84UuQKBgQCiJQquUbuW4tAYtazqEl2yNR7pIeTJF9NNeTroHf4cW6ZRAgun\n6qEOiX6xH1r8CrApFJXwMP3P/nvsT8LS59PdH07zj3f+zi38knFaJV27GA4f01v2\nIjoAlpHmtzNTcrPQrjdLW/OuzuYc5VB5XKbMJjuukW/VAZEaYR+b8mjCoQKBgHuZ\nD1pdWHSA5IE9MTPnERpmxzVqKtfVBm4yh3g96LG7s69yhHARqXnzH88OuCDIbU6w\n3h/VOFyA+n1PaShMzhs0eAk03oCWa193pTvDb4Lmyt0oi4g4IggAJ3vX+Pwd2Xmq\nOYN/sARYkjCwWL94Wr+91KAaTFMAaWyH7hXSjp9xAoGBANQgtrD2l6XsPBBEs26J\nRl7ygla+8kxoXtI7vRy37FKXGQgNNK6iJFvz+w9EFcMuPwP1I00uJUFTfaIcwQTa\nOTAdskAt/T1v9xP3pBn+tIgYzkkQ7SFhth+fMEg7Y6VoiqWkNnTpOcpTWbt5mFYG\nVo8p1LnC1NlUzao5nFiDXbSt\n-----END PRIVATE KEY-----\n",
+  "client_email": "laravel-storage-uploader@charged-chess-482722-h2.iam.gserviceaccount.com",
+  "client_id": "106737941591684869074",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/laravel-storage-uploader%40charged-chess-482722-h2.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
