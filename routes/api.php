@@ -35,7 +35,7 @@ Route::middleware([
     Route::get('dashboard/stats', [ReportController::class, 'stats']);
     Route::delete('reports/{id}', [ReportController::class, 'destroy']);
 
-    Route::post('/signed-url', function (Request $request) {
+/*     Route::post('/signed-url', function (Request $request) {
 
         $request->validate([
             'key' => 'required|string',
@@ -63,8 +63,9 @@ Route::middleware([
             'url' => $url,
             'objectName' => $objectName,
         ]);
-    });
+    }); */
 
+    Route::post('/signed-url', [ReportController::class, 'signedUrl']);
 
 
 });
