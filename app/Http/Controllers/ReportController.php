@@ -20,6 +20,21 @@ class ReportController extends Controller
         \Log::info('RAW SIZE', [
             'content_length' => request()->server('CONTENT_LENGTH'),
         ]);
+        \Log::info('REQUEST DATA', request()->all());
+        \Log::info('FILES DATA', request()->files->all());
+
+        try {
+            // ton code actuel de création du rapport
+        } catch (\Throwable $e) {
+            \Log::error('REPORT ERROR', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'request' => request()->all()
+            ]);
+            return response()->json(['message' => 'Server Erroree'], 500);
+        }
+
+
         $validated = $request->validate([
             'station_id' => 'required|integer|exists:stations,id',
             'date' => 'required|date',

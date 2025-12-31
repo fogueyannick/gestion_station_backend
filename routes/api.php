@@ -6,12 +6,15 @@ use App\Http\Controllers\ReportController;
 
 use App\Services\GcsUploader;
 use Illuminate\Http\Request;
+use Google\Cloud\Storage\StorageClient;
 
 
 // Routes publiques
 Route::post('auth/login', [AuthController::class, 'login'])->name('login');
 Route::post('auth/refresh', [AuthController::class, 'refresh']); // optionnel
 Route::get('/ping', fn() => response()->json(['status' => 'ok']));
+
+
 
 
 // Routes protégées SPA web (cookies)
@@ -31,11 +34,44 @@ Route::middleware([
     Route::get('reports', [ReportController::class, 'index']);
     Route::get('dashboard/stats', [ReportController::class, 'stats']);
     Route::delete('reports/{id}', [ReportController::class, 'destroy']);
-});
 
+    Route::post('/signed-url', function (Request $request) {
+
+        $request->validate([
+            'key' => 'required|string',
+            'extension' => 'required|string',
+        ]);
+
+        $storage = new StorageClient([
+            'keyFile' => json_decode(env('GCS_KEY'), true),
+        ]);
+
+        $bucket = $storage->bucket(env('GCS_BUCKET'));
+
+        $objectName = 'reports/' . uniqid() . '_' . $request->key . '.' . $request->extension;
+
+        $url = $bucket->object($objectName)->signedUrl(
+            now()->addMinutes(10),
+            [
+                'version' => 'v4',
+                'method' => 'PUT',
+                'contentType' => 'image/jpeg',
+            ]
+        );
+
+        return response()->json([
+            'url' => $url,
+            'objectName' => $objectName,
+        ]);
+    });
+
+
+
+});
 
 
 Route::post('/test-upload', function (Request $request) {
     $url = GcsUploader::upload($request->file('photo'), 'tests');
     return response()->json(['url' => $url]);
 });
+
